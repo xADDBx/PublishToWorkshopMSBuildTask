@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="GamePath.props" Condition="Exists('GamePath.props')" />
+	
+	<PropertyGroup>
+		<Title>PublishToWorkshop</Title>
+		<PackageId>PublishToWorkshop</PackageId>
+		<PackageVersion>1.0.7</PackageVersion>
+		<Description>Publish to Steam Workshop</Description>
+		<Authors>ADDB</Authors>
+		<PackageProjectUrl>https://github.com/xADDBx/PublishToRT</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/xADDBx/PublishToRT</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFrameworks>net472</TargetFrameworks>
+		<RootNamespace>PublishToWorkshop</RootNamespace>
+		<AssemblyName>PublishToWorkshop</AssemblyName>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<IsPackable>true</IsPackable>
+		<IsTestProject>false</IsTestProject>
+		<BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+		<Platforms>AnyCPU</Platforms>
+		<developmentDependency>true</developmentDependency>
+		<LangVersion>latest</LangVersion>
+		<Version>1.0.7</Version>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReleaseNotes></PackageReleaseNotes>
+	</PropertyGroup>
+	<PropertyGroup>
+		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+	</PropertyGroup>
+
+	<Target Name="GetDependencyTargetPaths">
+		<ItemGroup>
+			<TargetPathWithTargetPlatformMoniker Include="$(PKGNewtonsoft_Json)\lib\net45\Newtonsoft.Json.dll" IncludeRuntimeDependency="false" />
+			<TargetPathWithTargetPlatformMoniker Include="$(PKGFacepunch_Steamworks)\lib\net46\Facepunch.Steamworks.Win64.dll" IncludeRuntimeDependency="false" />
+		</ItemGroup>
+	</Target>
+	<ItemGroup>
+		<None Remove="*.props" />
+		<Content Include="PublishToWorkshop.MSBuild.Task.TargetFramework.props" Pack="true" PackagePath="build\PublishToWorkshop.props" />
+		<Content Include="PublishToWorkshop.MSBuild.Task.TargetFrameworks.props" Pack="true" PackagePath="buildMultiTargeting\PublishToWorkshop.props" />
+		<None Include="bin\Release\net472\Facepunch.Steamworks.Win64.dll" Pack="true" PackagePath="tasks\net472" Visible="false" />
+		<None Include="bin\Release\net472\Newtonsoft.Json.dll" Pack="true" PackagePath="tasks\net472" Visible="false" />
+		<None Include="lib\steam_api64.dll" Pack="true" PackagePath="tasks\net472" Visible="false" />
+		<None Include="LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="Microsoft.Build.Utilities.v4.0" />
+		<Reference Include="Microsoft.Build.Framework" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" PrivateAssets="All" GeneratePathProperty="true" />
+		<PackageReference Include="Facepunch.Steamworks" Version="2.3.3" PrivateAssets="All" GeneratePathProperty="true" />
+	</ItemGroup>
+</Project>
