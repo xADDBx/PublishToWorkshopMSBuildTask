@@ -1,0 +1,6 @@
+<Project TreatAsLocalProperty="TaskFolder;PublishTaskAssembly">
+  <PropertyGroup>
+    <PublishTaskAssembly>$(MSBuildThisFileDirectory)..\tasks\net472\PublishToRTWorkshop.dll</PublishTaskAssembly>
+  </PropertyGroup>
+  <UsingTask TaskName="RTPublishTask" AssemblyFile="$(PublishTaskAssembly)" />
+</Project> 
