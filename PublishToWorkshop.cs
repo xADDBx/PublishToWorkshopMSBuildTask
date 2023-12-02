@@ -53,7 +53,7 @@ namespace PublishToWorkshop {
             return true;
         }
 
-        public static async Task publishMod(string PathToManifest, string PathToImage, string PathToBuildFiles, OwlcatTemplateClass modInfo) {
+        public async Task publishMod(string PathToManifest, string PathToImage, string PathToBuildFiles, OwlcatTemplateClass modInfo) {
             PublishResult result;
             var uniqueID = modInfo.UniqueName.Replace(' ', '-');
             var tmpDirPath = Path.Combine(PathToBuildFiles, @"..\temp\");
@@ -61,6 +61,7 @@ namespace PublishToWorkshop {
             try {
                 di.Create();
             } catch {
+                Log.LogError($"Exception while trying to create temp directory: {tmpDirPath}.");
                 throw new IOException($"Exception while trying to create temp directory: {tmpDirPath}");
             }
             ZipFile.CreateFromDirectory(PathToBuildFiles, Path.Combine(tmpDirPath, $"{uniqueID}.zip"));
@@ -82,11 +83,13 @@ namespace PublishToWorkshop {
                     modInfo.WorkshopId = result.FileId.Value.ToString();
                     File.WriteAllText(PathToManifest, JsonConvert.SerializeObject(modInfo, Formatting.Indented));
                 } catch (Exception ex) {
-                    Console.WriteLine("Encountered exception while trying to add WorkshopId for newly published mod.");
-                    Console.WriteLine(ex.ToString());
+                    Log.LogError("Encountered exception while trying to add WorkshopId for newly published mod.");
+                    Log.LogError(ex.ToString());
                 }
             }
-            Console.WriteLine(result.Result.ToString());
+            if (result.Result != Result.OK) {
+                Log.LogError(result.Result.ToString());
+            }
             di.Delete(true);
         }
         public class OwlcatTemplateClass {
