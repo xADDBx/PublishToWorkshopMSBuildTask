@@ -39,14 +39,6 @@ namespace PublishToRTWorkshop {
                 if (!managedDir.Exists) {
                     throw new DirectoryNotFoundException($"Can't find managed game directory at: {managedPath}");
                 }
-                AppDomain.CurrentDomain.AssemblyResolve += (object sender, ResolveEventArgs args) => {
-                    AssemblyName requestedAssemblyName = new AssemblyName(args.Name);
-                    string assemblyFilePath = Path.Combine(managedPath, requestedAssemblyName.Name + ".dll");
-                    if (File.Exists(assemblyFilePath)) {
-                        return Assembly.LoadFrom(assemblyFilePath);
-                    }
-                    return null;
-                };
                 var modInfo = JsonConvert.DeserializeObject<OwlcatTemplateClass>(File.ReadAllText(PathToManifest));
                 if (modInfo != null) {
                     if (!SteamAPI.Init()) {
