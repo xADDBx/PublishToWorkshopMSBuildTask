@@ -4,7 +4,7 @@
 	<PropertyGroup>
 		<Title>PublishToRTWorkshop</Title>
 		<PackageId>PublishToRTWorkshop</PackageId>
-		<PackageVersion>1.0.3</PackageVersion>
+		<PackageVersion>1.0.4</PackageVersion>
 		<Description>Publish to RogueTrader Steam Workshop</Description>
 		<Authors>ADDB</Authors>
 		<PackageProjectUrl>https://github.com/xADDBx/PublishToRT</PackageProjectUrl>
@@ -23,15 +23,15 @@
 		<Platforms>AnyCPU</Platforms>
 		<developmentDependency>true</developmentDependency>
 		<LangVersion>latest</LangVersion>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<RogueTraderData2>$(LocalAppData)Low\Owlcat Games\Warhammer 40000 Rogue Trader</RogueTraderData2>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="*.props" />
-		<Content Include="PublishToRTWorkshop.MSBuild.Task.TargetFramework.props" Pack="true" PackagePath="build\PublishToRTWorkshop.MSBuild.Task.props" />
-		<Content Include="PublishToRTWorkshop.MSBuild.Task.TargetFrameworks.props" Pack="true" PackagePath="buildMultiTargeting\PublishToRTWorkshop.MSBuild.Task.props" />
+		<Content Include="PublishToRTWorkshop.MSBuild.Task.TargetFramework.props" Pack="true" PackagePath="build\PublishToRTWorkshop.props" />
+		<Content Include="PublishToRTWorkshop.MSBuild.Task.TargetFrameworks.props" Pack="true" PackagePath="buildMultiTargeting\PublishToRTWorkshop.props" />
 		<None Include="LICENSE">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
