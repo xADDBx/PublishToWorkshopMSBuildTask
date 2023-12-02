@@ -14,10 +14,9 @@ Add Target with Task. Integrate it however you want; here as AfterBuild Target a
 </Target>/>
 ```
 
-PathToManifest => Absolute path to the the OwlcatModificationManifest.json
+Arguments:
 
-ImageDir => Absolute path to the directory containing the image file. The name of the image file is specified in OwlcatModificationManifest.json
-
-BuildDir => Directory containing the mod files
-
-GameAppId => AppId of the game you want to publish to, defaults to 2186680 which is Warhammer 40,000: Rogue Trader
+- `PathToManifest`: Absolute path to the the OwlcatModificationManifest.json
+- `ImageDir`: Absolute path to the directory containing the image file. The name of the image file is specified in OwlcatModificationManifest.json
+- `BuildDir`: Directory containing the mod files
+- `GameAppId`: AppId of the game you want to publish to, defaults to 2186680 which is Warhammer 40,000: Rogue Trader
