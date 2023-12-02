@@ -4,7 +4,7 @@
 	<PropertyGroup>
 		<Title>PublishToRTWorkshop</Title>
 		<PackageId>PublishToRTWorkshop</PackageId>
-		<PackageVersion>1.0.4</PackageVersion>
+		<PackageVersion>1.0.7</PackageVersion>
 		<Description>Publish to RogueTrader Steam Workshop</Description>
 		<Authors>ADDB</Authors>
 		<PackageProjectUrl>https://github.com/xADDBx/PublishToRT</PackageProjectUrl>
@@ -23,57 +23,26 @@
 		<Platforms>AnyCPU</Platforms>
 		<developmentDependency>true</developmentDependency>
 		<LangVersion>latest</LangVersion>
-		<Version>1.0.4</Version>
+		<Version>1.0.7</Version>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReleaseNotes></PackageReleaseNotes>
-		<RogueTraderData2>$(LocalAppData)Low\Owlcat Games\Warhammer 40000 Rogue Trader</RogueTraderData2>
 	</PropertyGroup>
+	
 	<ItemGroup>
 		<None Remove="*.props" />
 		<Content Include="PublishToRTWorkshop.MSBuild.Task.TargetFramework.props" Pack="true" PackagePath="build\PublishToRTWorkshop.props" />
-		<Content Include="PublishToRTWorkshop.MSBuild.Task.TargetFrameworks.props" Pack="true" PackagePath="buildMultiTargeting\PublishToRTWorkshop.props" />
+		<Content Include="lib\Steamworks.NET.dll" Pack="true" PackagePath="lib\Steamworks.NET.dll" />
+		<Content Include="lib\Newtonsoft.Json.dll" Pack="true" PackagePath="lib\Newtonsoft.Json.dll" />
 		<None Include="LICENSE">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="Newtonsoft.Json">
-			<HintPath>$(RogueTraderInstallDir2)\WH40KRT_Data\Managed\Newtonsoft.Json.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Steamworks.NET">
-			<HintPath>$(RogueTraderInstallDir2)\WH40KRT_Data\Managed\Steamworks.NET.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="com.rlabrecque.steamworks.net">
-			<HintPath>$(RogueTraderInstallDir2)\WH40KRT_Data\Managed\com.rlabrecque.steamworks.net.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
 		<Reference Include="Microsoft.Build.Utilities.v4.0" />
 		<Reference Include="Microsoft.Build.Framework" />
+		<Reference Include="Steamworks.NET" HintPath="lib\Steamworks.NET.dll" />
+		<Reference Include="Newtonsoft.Json" HintPath="lib\Newtonsoft.Json.dll" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="Assets\*.*">
-		<Link>%(Filename)%(Extension)</Link>
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	</ItemGroup>
-	<Target Name="GenerateCustomPropsFile" BeforeTargets="BeforeBuild" Condition="$(RogueTraderInstallDir2) == ''">
-		<Exec Command="findstr /C:&quot;Mono path[0]&quot; &quot;$(RogueTraderData2)\Player.log&quot;" IgnoreExitCode="true" ConsoleToMSBuild="true">
-			<Output TaskParameter="ExitCode" PropertyName="ExitCode" />
-			<Output TaskParameter="ConsoleOutput" PropertyName="MonoPathLine" />
-		</Exec>
-
-		<PropertyGroup>
-			<MonoPathRegex>^Mono path\[0\] = '(.*?)/WH40KRT_Data/Managed'$</MonoPathRegex>
-		</PropertyGroup>
-
-		<PropertyGroup>
-			<RogueTraderInstallDir2>$([System.Text.RegularExpressions.Regex]::Match($(MonoPathLine), $(MonoPathRegex)).Groups[1].Value)</RogueTraderInstallDir2>
-		</PropertyGroup>
-
-		<WriteLinesToFile File="GamePath.props" Lines="&lt;Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003'&gt; &#xA;	&lt;PropertyGroup&gt; &#xA;		&lt;RogueTraderInstallDir2&gt;$(RogueTraderInstallDir)&lt;/RogueTraderInstallDir2&gt;&#xA;	&lt;/PropertyGroup&gt;&#xA;&lt;/Project&gt;" Overwrite="true" Encoding="utf-8" />
-	</Target>
 </Project>
