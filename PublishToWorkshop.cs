@@ -25,15 +25,19 @@ namespace PublishToWorkshop {
         public int GameAppId { get; set; }
 
         public override bool Execute() {
+            bool result = true;
             try {
                 if (!new FileInfo(PathToManifest).Exists) {
-                    throw new FileNotFoundException($"Can't find Manifest file at: {PathToManifest}");
+                    Log.LogError($"Can't find Manifest file at: {PathToManifest}");
+                    return false;
                 }
                 if (!new DirectoryInfo(ImageDir).Exists) {
-                    throw new FileNotFoundException($"Can't find directory containing image at: {ImageDir}");
+                    Log.LogError($"Can't find directory containing image at: {ImageDir}");
+                    return false;
                 }
                 if (!new DirectoryInfo(BuildDir).Exists) {
-                    throw new DirectoryNotFoundException($"Can't find Directory with build artifacts at: {BuildDir}");
+                    Log.LogError($"Can't find Directory with build artifacts at: {BuildDir}");
+                    return false;
                 }
                 if (GameAppId > 0) {
                     AppId = GameAppId;
@@ -41,19 +45,20 @@ namespace PublishToWorkshop {
                 var modInfo = JsonConvert.DeserializeObject<OwlcatTemplateClass>(File.ReadAllText(PathToManifest));
                 if (modInfo != null) {
                     SteamClient.Init(AppId);
-                    publishMod(PathToManifest, ImageDir, BuildDir, modInfo).GetAwaiter().GetResult();
+                    result = publishMod(PathToManifest, ImageDir, BuildDir, modInfo).GetAwaiter().GetResult();
                     SteamClient.Shutdown();
                 } else {
-                    throw new Exception("Deserialization of ManifestFile resulted in null");
+                    Log.LogError("Deserialization of ManifestFile resulted in null");
+                    return false;
                 }
             } catch (Exception ex) {
                 Log.LogError(ex.ToString());
-                return false;
+                result = false;
             }
-            return true;
+            return result;
         }
 
-        public async Task publishMod(string PathToManifest, string PathToImage, string PathToBuildFiles, OwlcatTemplateClass modInfo) {
+        public async Task<bool> publishMod(string PathToManifest, string PathToImage, string PathToBuildFiles, OwlcatTemplateClass modInfo) {
             PublishResult result;
             var uniqueID = modInfo.UniqueName.Replace(' ', '-');
             var tmpDirPath = Path.Combine(PathToBuildFiles, @"..\temp\");
@@ -62,8 +67,9 @@ namespace PublishToWorkshop {
                 di.Create();
             } catch {
                 Log.LogError($"Exception while trying to create temp directory: {tmpDirPath}.");
-                throw new IOException($"Exception while trying to create temp directory: {tmpDirPath}");
+                return false;
             }
+            bool ret = true;
             ZipFile.CreateFromDirectory(PathToBuildFiles, Path.Combine(tmpDirPath, $"{uniqueID}.zip"));
             if (ulong.TryParse(modInfo.WorkshopId, out var modID)) {
                 var id = new PublishedFileId();
@@ -85,12 +91,15 @@ namespace PublishToWorkshop {
                 } catch (Exception ex) {
                     Log.LogError("Encountered exception while trying to add WorkshopId for newly published mod.");
                     Log.LogError(ex.ToString());
+                    ret = false;
                 }
             }
             if (result.Result != Result.OK) {
-                Log.LogError(result.Result.ToString());
+                Log.LogError($"Steam Workshop Update Failed with result: {result.Result}");
+                ret = false;
             }
             di.Delete(true);
+            return ret;
         }
         public class OwlcatTemplateClass {
             public string UniqueName;

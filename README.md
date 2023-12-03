@@ -4,7 +4,7 @@
 
 Reference the package:
 ```
-<PackageReference Include="PublishToWorkshop" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" Version="1.0.8" PrivateAssets="all" />
+<PackageReference Include="PublishToWorkshop" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" Version="1.0.9" PrivateAssets="all" />
 ```
 
 Add Target with Task. Integrate it however you want; here as AfterBuild Target as an example:
