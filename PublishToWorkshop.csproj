@@ -4,7 +4,7 @@
 	<PropertyGroup>
 		<Title>PublishToWorkshop</Title>
 		<PackageId>PublishToWorkshop</PackageId>
-		<PackageVersion>1.0.9</PackageVersion>
+		<PackageVersion>1.0.10</PackageVersion>
 		<Description>Publish to Steam Workshop</Description>
 		<Authors>ADDB</Authors>
 		<PackageProjectUrl>https://github.com/xADDBx/PublishToRT</PackageProjectUrl>
@@ -23,7 +23,7 @@
 		<Platforms>AnyCPU</Platforms>
 		<developmentDependency>true</developmentDependency>
 		<LangVersion>latest</LangVersion>
-		<Version>1.0.9</Version>
+		<Version>1.0.10</Version>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReleaseNotes></PackageReleaseNotes>
 	</PropertyGroup>

@@ -21,7 +21,8 @@ namespace PublishToWorkshop {
         [Required]
         public string ImageDir { get; set; }
         [Required]
-        public string BuildDir { get; set; }
+        public string BuildDir { get; set; }        
+        public string PathToDescription { get; set; }
         public int GameAppId { get; set; }
 
         public override bool Execute() {
@@ -45,7 +46,7 @@ namespace PublishToWorkshop {
                 var modInfo = JsonConvert.DeserializeObject<OwlcatTemplateClass>(File.ReadAllText(PathToManifest));
                 if (modInfo != null) {
                     SteamClient.Init(AppId);
-                    result = publishMod(PathToManifest, ImageDir, BuildDir, modInfo).GetAwaiter().GetResult();
+                    result = PublishMod(PathToManifest, ImageDir, BuildDir, modInfo, PathToDescription).GetAwaiter().GetResult();
                     SteamClient.Shutdown();
                 } else {
                     Log.LogError("Deserialization of ManifestFile resulted in null");
@@ -58,7 +59,7 @@ namespace PublishToWorkshop {
             return result;
         }
 
-        public async Task<bool> publishMod(string PathToManifest, string PathToImage, string PathToBuildFiles, OwlcatTemplateClass modInfo) {
+        public async Task<bool> PublishMod(string PathToManifest, string PathToImage, string PathToBuildFiles, OwlcatTemplateClass modInfo, string PathToDescription) {
             PublishResult result;
             var uniqueID = modInfo.UniqueName.Replace(' ', '-');
             var tmpDirPath = Path.Combine(PathToBuildFiles, @"..\temp\");
@@ -71,18 +72,23 @@ namespace PublishToWorkshop {
             }
             bool ret = true;
             ZipFile.CreateFromDirectory(PathToBuildFiles, Path.Combine(tmpDirPath, $"{uniqueID}.zip"));
+            var description = modInfo.Description ?? "";
+            if (!string.IsNullOrEmpty(PathToDescription) && new FileInfo(PathToDescription).Exists)
+            {
+                description = File.ReadAllText(PathToDescription);
+            }
             if (ulong.TryParse(modInfo.WorkshopId, out var modID)) {
                 var id = new PublishedFileId();
                 id.Value = modID;
                 result = await new Editor(id)
                           .WithTitle(modInfo.DisplayName ?? "")
-                          .WithDescription(modInfo.Description ?? "")
+                          .WithDescription(description)
                           .WithContent(di)
                           .WithPreviewFile(Path.Combine(PathToImage, modInfo.ImageName)).SubmitAsync();
             } else {
                 result = await Editor.NewCommunityFile
                           .WithTitle(modInfo.DisplayName ?? "")
-                          .WithDescription(modInfo.Description ?? "")
+                          .WithDescription(description)
                           .WithContent(di)
                           .WithPreviewFile(Path.Combine(PathToImage, modInfo.ImageName)).SubmitAsync();
                 try {
