@@ -27,6 +27,11 @@ namespace PublishToWorkshop {
 
         public override bool Execute() {
             bool result = true;
+            Log.LogMessage(MessageImportance.High, $"PathToManifest: {PathToManifest}");
+            Log.LogMessage(MessageImportance.High, $"ImageDir: {ImageDir}");
+            Log.LogMessage(MessageImportance.High, $"BuildDir: {BuildDir}");
+            Log.LogMessage(MessageImportance.High, $"PathToDescription: {PathToDescription}");
+            Log.LogMessage(MessageImportance.High, $"GameAppId: {GameAppId}");
             try {
                 if (!new FileInfo(PathToManifest).Exists) {
                     Log.LogError($"Can't find Manifest file at: {PathToManifest}");
@@ -62,7 +67,7 @@ namespace PublishToWorkshop {
         public async Task<bool> PublishMod(string PathToManifest, string PathToImage, string PathToBuildFiles, OwlcatTemplateClass modInfo, string PathToDescription) {
             PublishResult result;
             var uniqueID = modInfo.UniqueName.Replace(' ', '-');
-            var tmpDirPath = Path.Combine(PathToBuildFiles, @"..\temp\");
+            var tmpDirPath = Path.Combine(PathToBuildFiles, @"..\temp\");            
             var di = new DirectoryInfo(tmpDirPath);
             try {
                 di.Create();
@@ -71,27 +76,46 @@ namespace PublishToWorkshop {
                 return false;
             }
             bool ret = true;
-            ZipFile.CreateFromDirectory(PathToBuildFiles, Path.Combine(tmpDirPath, $"{uniqueID}.zip"));
+            var zipPath = Path.Combine(tmpDirPath, $"{uniqueID}.zip");
+            ZipFile.CreateFromDirectory(PathToBuildFiles, zipPath);
+            var zipInfo = new FileInfo(zipPath);
+            Log.LogMessage(MessageImportance.High, $"Mod archive size: {zipInfo.Length / 1024} KB");
             var description = modInfo.Description ?? "";
             if (!string.IsNullOrEmpty(PathToDescription) && new FileInfo(PathToDescription).Exists)
             {
                 description = File.ReadAllText(PathToDescription);
+                Log.LogMessage(MessageImportance.High, $"Description read from file. Length: {description.Length}");
             }
+            var imagePath = Path.Combine(PathToImage, modInfo.ImageName);
+            Log.LogMessage(MessageImportance.High, $"Path to thumbnail: {imagePath}");
+            if (File.Exists(imagePath))
+            {
+                var fileInfo = new FileInfo(imagePath);
+                Log.LogMessage(MessageImportance.High, $"Image size: {fileInfo.Length / 1024} KB");
+                if (fileInfo.Length > 900 * 1024) {
+                    Log.LogWarning("Image appears to be larger than 900 KB, Steam doesn't accept previews larger than 1 MB.");
+                }
+            }
+            var modTitle = modInfo.DisplayName ?? "";
+            Log.LogMessage(MessageImportance.High, $"Mod title: {modTitle}");
             if (ulong.TryParse(modInfo.WorkshopId, out var modID)) {
                 var id = new PublishedFileId();
                 id.Value = modID;
+                Log.LogMessage(MessageImportance.High, $"Will update mod id {modID}");
                 result = await new Editor(id)
-                          .WithTitle(modInfo.DisplayName ?? "")
+                          .WithTitle(modTitle)
                           .WithDescription(description)
                           .WithContent(di)
-                          .WithPreviewFile(Path.Combine(PathToImage, modInfo.ImageName)).SubmitAsync();
+                          .WithPreviewFile(imagePath).SubmitAsync();
             } else {
+                Log.LogMessage(MessageImportance.High, $"Will create new mod");
                 result = await Editor.NewCommunityFile
-                          .WithTitle(modInfo.DisplayName ?? "")
+                          .WithTitle(modTitle)
                           .WithDescription(description)
                           .WithContent(di)
-                          .WithPreviewFile(Path.Combine(PathToImage, modInfo.ImageName)).SubmitAsync();
+                          .WithPreviewFile(imagePath).SubmitAsync();
                 try {
+                    Log.LogMessage(MessageImportance.High, $"Created mod id: {result.FileId.Value}");
                     modInfo.WorkshopId = result.FileId.Value.ToString();
                     File.WriteAllText(PathToManifest, JsonConvert.SerializeObject(modInfo, Formatting.Indented));
                 } catch (Exception ex) {
